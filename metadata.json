@@ -1,0 +1,6 @@
+{
+  "name": "Smart Luggage",
+  "description": "IoT-Based Smart Luggage Weight Distribution System Dashboard",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
