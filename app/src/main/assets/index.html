@@ -18,42 +18,90 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
             margin: 0;
             padding: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
+            min-height: 100vh;
+            color: var(--text-color);
+            background: linear-gradient(-45deg, #1a0b2e, #0e1e3b, #122936, #121212);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Liquid Background Animation */
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Liquid Blob Effect behind everything */
+        body::before {
+            content: "";
+            position: absolute;
+            top: -10%; left: -10%; right: -10%; bottom: -10%;
+            background: radial-gradient(circle at 50% 50%, rgba(187, 134, 252, 0.15), transparent 60%),
+                        radial-gradient(circle at 80% 20%, rgba(3, 218, 198, 0.15), transparent 50%),
+                        radial-gradient(circle at 20% 80%, rgba(3, 218, 198, 0.15), transparent 50%);
+            filter: blur(60px);
+            z-index: -1;
+            animation: floatBlobs 20s ease-in-out infinite alternate;
+        }
+
+        @keyframes floatBlobs {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(5%, 5%) scale(1.1); }
+            100% { transform: translate(-5%, -5%) scale(0.9); }
         }
 
         header {
             width: 100%;
-            background-color: var(--surface-color);
-            padding: 20px;
+            padding: 20px 0;
             text-align: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            background: rgba(30, 30, 30, 0.3);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            z-index: 10;
         }
 
-        h1 { margin: 0; font-size: 1.5rem; color: var(--primary-color); }
+        h1 { margin: 0; font-size: 1.8rem; color: var(--primary-color); letter-spacing: 1px; }
 
         .container {
             width: 90%;
             max-width: 1000px;
-            margin-top: 20px;
+            margin-top: 30px;
+            margin-bottom: 40px;
             display: grid;
             grid-template-columns: 1fr 1fr;
-            grid-gap: 20px;
+            grid-gap: 25px;
+            z-index: 1;
         }
 
         .card {
-            background-color: var(--surface-color);
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            background: rgba(40, 40, 40, 0.25);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
             display: flex;
             flex-direction: column;
             align-items: center;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 255, 255, 0.15);
         }
 
         /* Settings */
@@ -222,23 +270,30 @@
     <div class="container">
         <!-- Settings & Source Switcher -->
         <div class="card settings-card">
-            <div class="control-group">
-                <label for="limit-select"><strong>Airline Limit:</strong></label>
-                <select id="limit-select">
-                    <option value="15">15 kg (Budget)</option>
-                    <option value="23" selected>23 kg (Standard)</option>
-                    <option value="32">32 kg (Heavy/First Class)</option>
-                </select>
+            <div class="control-group" style="width: 100%; justify-content: space-between;">
+                <div>
+                    <label for="limit-select"><strong>Airline Limit:</strong></label>
+                    <select id="limit-select">
+                        <option value="15">15 kg (Budget)</option>
+                        <option value="23" selected>23 kg (Standard)</option>
+                        <option value="32">32 kg (Heavy/First Class)</option>
+                    </select>
+                </div>
+            
+                <div>
+                    <label for="source-select"><strong>Data Source:</strong></label>
+                    <select id="source-select" style="background-color: var(--surface-color);">
+                        <option value="simulated" selected>Local Simulation</option>
+                        <option value="firebase">Live Firebase DB</option>
+                        <option value="esp32">ESP32 Direct IP</option>
+                    </select>
+                </div>
             </div>
             
-            <div class="control-group">
-                <strong>Data Source:</strong>
-                <span id="source-label" style="font-weight: bold; color: #888;">Simulated</span>
-                <label class="switch">
-                    <input type="checkbox" id="source-toggle">
-                    <span class="slider"></span>
-                </label>
-                <span style="font-weight: bold; color: var(--success-color);">Live DB</span>
+            <!-- ESP32 Settings Panel -->
+            <div id="esp32-settings" class="control-group" style="display: none; width: 100%; justify-content: center; margin-top: 10px;">
+                <input type="text" id="esp32-ip" placeholder="ESP32 IP (e.g. 192.168.1.100)" style="flex:1; padding: 10px; border-radius: 8px; background: #333; color: #fff; border: 1px solid #555; max-width: 300px;">
+                <button id="esp32-connect-btn" style="padding: 10px 20px; border-radius: 8px; background: var(--primary-color); border: none; font-weight: bold; cursor: pointer; color: #121212; transition: filter 0.3s;">Connect</button>
             </div>
         </div>
 
@@ -311,9 +366,11 @@
         const q3 = document.getElementById('q3');
         const q4 = document.getElementById('q4');
         const historyBody = document.getElementById('history-body');
-        const sourceToggle = document.getElementById('source-toggle');
+        const sourceSelect = document.getElementById('source-select');
         const dbStatus = document.getElementById('db-status');
-        const sourceLabel = document.getElementById('source-label');
+        const esp32Settings = document.getElementById('esp32-settings');
+        const esp32IpInput = document.getElementById('esp32-ip');
+        const esp32ConnectBtn = document.getElementById('esp32-connect-btn');
 
         // Chart.js Setup
         const ctx = document.getElementById('cogChart').getContext('2d');
@@ -450,45 +507,84 @@
 
         let mockInterval = setInterval(fetchIoTData, 2000);
         let fbListener = null;
+        let esp32Interval = null;
 
-        // Controller logic for Sim vs Live
-        sourceToggle.addEventListener('change', (e) => {
-            if (e.target.checked) {
-                // Switching to Live DB
-                clearInterval(mockInterval);
-                mockInterval = null;
-                sourceLabel.style.color = '#888';
-                dbStatus.textContent = "Status: Connecting to Live Firebase Database...";
-                dbStatus.style.color = "var(--primary-color)";
+        function clearSources() {
+            if (mockInterval) { clearInterval(mockInterval); mockInterval = null; }
+            if (fbListener) { db.ref('/luggage_data/').off('value', fbListener); fbListener = null; }
+            if (esp32Interval) { clearInterval(esp32Interval); esp32Interval = null; }
+        }
 
-                // Enable listener
-                fbListener = db.ref('/luggage_data/').on('value', (snapshot) => {
-                    dbStatus.textContent = "Status: Successfully synchronized with Live DB!";
-                    dbStatus.style.color = "var(--success-color)";
-                    if (snapshot.exists()) {
-                        updateDashboard(snapshot.val());
-                    } else {
-                        // Fallback checking root node in case of path mismatch
-                        db.ref('/').once('value', (snap) => {
-                            const val = snap.val();
-                            if (val) {
-                                updateDashboard(val.luggage_data || val);
-                            }
-                        });
-                    }
-                }, (error) => {
-                    dbStatus.textContent = "Status Error: " + error.message;
-                    dbStatus.style.color = "var(--error-color)";
-                });
-            } else {
-                // Switching back to Local Simulation
-                if (fbListener) {
-                    db.ref('/luggage_data/').off('value', fbListener);
-                    fbListener = null;
-                }
-                dbStatus.textContent = "Status: Using local simulation data";
+        async function fetchEsp32Data() {
+            const ip = esp32IpInput.value.trim();
+            if(!ip) return;
+            try {
+               const response = await fetch(`http://${ip}/data`);
+               if(response.ok) {
+                   const data = await response.json();
+                   updateDashboard(data);
+                   dbStatus.textContent = `Status: Synced with ESP32 at ${ip}`;
+                   dbStatus.style.color = "var(--success-color)";
+               }
+            } catch (err) {
+               dbStatus.textContent = "Status Error: Cannot connect to ESP32 /data endpoint";
+               dbStatus.style.color = "var(--error-color)";
+            }
+        }
+
+        esp32ConnectBtn.addEventListener('click', () => {
+            const ip = esp32IpInput.value.trim();
+            if(!ip) {
+                alert("Please enter a valid ESP32 IP address");
+                return;
+            }
+            dbStatus.textContent = `Status: Connecting to ESP32 at ${ip}...`;
+            dbStatus.style.color = "var(--primary-color)";
+            clearSources();
+            esp32Interval = setInterval(fetchEsp32Data, 2000);
+            fetchEsp32Data();
+        });
+
+        // Controller logic for Data Source Selection
+        sourceSelect.addEventListener('change', (e) => {
+            clearSources();
+            const val = e.target.value;
+            
+            if (val === 'esp32') {
+                esp32Settings.style.display = 'flex';
+                dbStatus.textContent = "Status: Waiting for ESP32 IP address...";
                 dbStatus.style.color = "#888";
-                mockInterval = setInterval(fetchIoTData, 2000);
+            } else {
+                esp32Settings.style.display = 'none';
+                
+                if (val === 'firebase') {
+                    dbStatus.textContent = "Status: Connecting to Live Firebase Database...";
+                    dbStatus.style.color = "var(--primary-color)";
+
+                    // Enable Firebase listener
+                    fbListener = db.ref('/luggage_data/').on('value', (snapshot) => {
+                        dbStatus.textContent = "Status: Successfully synchronized with Live DB!";
+                        dbStatus.style.color = "var(--success-color)";
+                        if (snapshot.exists()) {
+                            updateDashboard(snapshot.val());
+                        } else {
+                            // Fallback checking root node in case of path mismatch
+                            db.ref('/').once('value', (snap) => {
+                                const val = snap.val();
+                                if (val) {
+                                    updateDashboard(val.luggage_data || val);
+                                }
+                            });
+                        }
+                    }, (error) => {
+                        dbStatus.textContent = "Status Error: " + error.message;
+                        dbStatus.style.color = "var(--error-color)";
+                    });
+                } else if (val === 'simulated') {
+                    dbStatus.textContent = "Status: Using local simulation data";
+                    dbStatus.style.color = "#888";
+                    mockInterval = setInterval(fetchIoTData, 2000);
+                }
             }
         });
 
